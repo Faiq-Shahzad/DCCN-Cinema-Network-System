@@ -14,7 +14,7 @@ import java.util.Scanner;
 
 /**
  *
- * @author Ahmed
+ * @author MUHMMAD AHMED && FAIQ SHAHZAD
  */
 public class CinemaNetworkApp {
 
