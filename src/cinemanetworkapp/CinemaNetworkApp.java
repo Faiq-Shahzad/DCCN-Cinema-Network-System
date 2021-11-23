@@ -28,7 +28,7 @@ public class CinemaNetworkApp {
         Scanner input= new Scanner(System.in);
         InetAddress IPAddress;
         try {
-            IPAddress=InetAddress.getByName("DELL-021");
+            IPAddress=InetAddress.getByName("HP-15T");
         } catch (UnknownHostException ex) {
             ex.printStackTrace();
             System.out.println("Host Not Found Please Restart Application");
@@ -59,6 +59,13 @@ public class CinemaNetworkApp {
 
                 System.out.println("Enter Password");
                 String password = input.next();
+
+                System.out.println("Confirm registering "+username+" (Y/N): ");
+                String userConf = input.next();
+
+                if(!userConf.trim().equalsIgnoreCase("y")){
+                    continue;
+                }
 
                 boolean userRegistered = sendUserData(username,password,"0,U");
                 if(userRegistered){
@@ -162,6 +169,7 @@ public class CinemaNetworkApp {
                             //Processing User Input
 
                             if (movieChk) {
+                                Message operation = new Message("-1,M");
                                 if (userIn == 4) {
                                     break;
                                 } else if (userIn == 1) {
@@ -177,29 +185,52 @@ public class CinemaNetworkApp {
 
                                         dataObject = new Movie(id, name, rating, year);
 
-                                        dataObject.setOperation(0);
+                                        operation = new Message("0,M");
+
+                                        if (!myClient.sendObject(operation)) {
+                                            System.out.println("Error Sending Data");
+                                            continue;
+                                        }
+
+                                        if (!myClient.sendObject(dataObject)) {
+                                            System.out.println("Error Sending Data");
+                                            continue;
+                                        }
+
                                     } else {
                                         System.out.println("Only Admin has the Authorization to Add Movies!");
-                                        dataObject.setOperation(4);
+                                        continue;
                                     }
 
                                 } else if (userIn == 2) {
-                                    dataObject = new Movie(0, "", 0, 0);
+                                    operation = new Message("1,M");
 
-                                    dataObject.setOperation(1);
+                                    if (!myClient.sendObject(operation)) {
+                                        System.out.println("Error Sending Data");
+                                        continue;
+                                    }
                                 } else {
                                     System.out.println("Enter Movie Id: ");
                                     int id = input.nextInt();
                                     dataObject = new Movie(id, "", 0, 0);
+                                    operation = new Message("2,M");
 
-                                    dataObject.setOperation(2);
+                                    if (!myClient.sendObject(operation)) {
+                                        System.out.println("Error Sending Data");
+                                        continue;
+                                    }
+
+                                    if (!myClient.sendObject(dataObject)) {
+                                        System.out.println("Error Sending Data");
+                                        continue;
+                                    }
                                 }
 
                                 //Sending Data
-                                if (!myClient.sendObject(dataObject)) {
-                                    System.out.println("Error Sending Data");
-                                    continue;
-                                }
+//                                if (!myClient.sendObject(dataObject)) {
+//                                    System.out.println("Error Sending Data");
+//                                    continue;
+//                                }
 
                                 System.out.println("Waiting For Response");
 
