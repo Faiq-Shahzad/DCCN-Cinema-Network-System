@@ -345,8 +345,9 @@ public class server {
                         System.out.println(ticketObject.toString());
 
                         int ticketId = ticketObject.id;
+                        int movieId = ticketObject.bookedMovie.id;
                         System.out.println(ticketId);
-                        boolean ticketChk = false;
+                        boolean ticketChk = true;
 
 
                         for (Ticket tkt : myTickets) {
@@ -357,11 +358,29 @@ public class server {
                                 //sending response if found
                                 myServer.sendResponse(new Message("Id already Exists! Please TRY AGAIN!"), myServer.packetIP, myServer.packetPort);
                                 System.out.println("Response Sent");
-                                ticketChk = true;
+                                ticketChk = false;
                                 break;
                             }
                         }
-                        if (!ticketChk){
+                        boolean movieCheck = false;
+
+                        for(Movie mov : mylist){
+                            if(mov.id == movieId){
+                                System.out.println("Movie with Id Found "+movieId);
+                                ticketObject.bookedMovie.name = mov.name;
+                                ticketObject.bookedMovie.rating = mov.rating;
+                                ticketObject.bookedMovie.year = mov.year;
+                                movieCheck = true;
+                                break;
+                            }
+                        }
+
+                        if(!movieCheck){
+                            myServer.sendResponse(new Message("Movie Id Does not Exists"), myServer.packetIP, myServer.packetPort);
+                            System.out.println("Response Sent");
+                        }
+
+                        if (ticketChk && movieCheck){
                             //Saving Data to file
                             myTickets.add(ticketObject);
                             writeDataToFile("T");
