@@ -16,7 +16,6 @@ public class Movie implements Serializable {
     String name;
     int rating;
     int year;
-    int operation;
 
     public Movie(int id, String name, int rating, int year) {
         this.id = id;
@@ -28,14 +27,6 @@ public class Movie implements Serializable {
     @Override
     public String toString() {
         return "Movie{" + "id=" + id + ", name=" + name + ", rating=" + rating + ", year=" + year + '}';
-    }
-
-    public int getOperation() {
-        return operation;
-    }
-
-    public void setOperation(int operation) {
-        this.operation = operation;
     }
 
 
