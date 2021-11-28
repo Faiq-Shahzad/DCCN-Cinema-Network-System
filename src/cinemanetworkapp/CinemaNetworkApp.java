@@ -29,7 +29,7 @@ public class CinemaNetworkApp {
         Scanner input= new Scanner(System.in).useDelimiter("\n");
         InetAddress IPAddress;
         try {
-            IPAddress=InetAddress.getByName("DELL-021");
+            IPAddress=InetAddress.getByName("HP-15T");
         } catch (UnknownHostException ex) {
             ex.printStackTrace();
             System.out.println("Host Not Found Please Restart Application");
@@ -172,69 +172,55 @@ public class CinemaNetworkApp {
 
                             //Processing User Input
 
+
+
                             if (movieChk) {
-                                Message operation = new Message("-1,M");
-                                if (userIn == 5) {
-                                    break;
-                                } else if (userIn == 3) {
-                                    if (currentUser.equals("admin")) {
-                                        System.out.print("Enter Movie Id: ");
-                                        int id = input.nextInt();
-                                        System.out.print("Enter Movie Name: ");
-                                        String name = input.next();
-                                        System.out.print("Enter Movie Rating: ");
-                                        int rating = input.nextInt();
-                                        System.out.print("Enter Movie Year: ");
-                                        int year = input.nextInt();
+                                try{
+                                    Message operation = new Message("-1,M");
+                                    if (userIn == 5) {
+                                        break;
+                                    } else if (userIn == 3) {
+                                        if (currentUser.equals("admin")) {
+                                            System.out.print("Enter Movie Id: ");
+                                            int id = input.nextInt();
+                                            System.out.print("Enter Movie Name: ");
+                                            String name = input.next();
+                                            System.out.print("Enter Movie Rating: ");
+                                            int rating = input.nextInt();
+                                            System.out.print("Enter Movie Year: ");
+                                            int year = input.nextInt();
 
-                                        dataObject = new Movie(id, name, rating, year);
+                                            dataObject = new Movie(id, name, rating, year);
 
-                                        operation = new Message("0,M");
+                                            operation = new Message("0,M");
+
+                                            if (!myClient.sendObject(operation)) {
+                                                System.out.println("Error Sending Data");
+                                                continue;
+                                            }
+
+                                            if (!myClient.sendObject(dataObject)) {
+                                                System.out.println("Error Sending Data");
+                                                continue;
+                                            }
+
+                                        } else {
+                                            System.out.println("Only Admin has the Authorization to Add Movies!");
+                                            continue;
+                                        }
+
+                                    } else if (userIn == 1) {
+                                        operation = new Message("1,M");
 
                                         if (!myClient.sendObject(operation)) {
                                             System.out.println("Error Sending Data");
                                             continue;
                                         }
-
-                                        if (!myClient.sendObject(dataObject)) {
-                                            System.out.println("Error Sending Data");
-                                            continue;
-                                        }
-
-                                    } else {
-                                        System.out.println("Only Admin has the Authorization to Add Movies!");
-                                        continue;
-                                    }
-
-                                } else if (userIn == 1) {
-                                    operation = new Message("1,M");
-
-                                    if (!myClient.sendObject(operation)) {
-                                        System.out.println("Error Sending Data");
-                                        continue;
-                                    }
-                                } else if(userIn == 2) {
-                                    System.out.println("Enter Movie Id: ");
-                                    int id = input.nextInt();
-                                    dataObject = new Movie(id, "", 0, 0);
-                                    operation = new Message("2,M");
-
-                                    if (!myClient.sendObject(operation)) {
-                                        System.out.println("Error Sending Data");
-                                        continue;
-                                    }
-
-                                    if (!myClient.sendObject(dataObject)) {
-                                        System.out.println("Error Sending Data");
-                                        continue;
-                                    }
-                                }
-                                else if(userIn == 4) {
-                                    if (currentUser.equals("admin")) {
+                                    } else if (userIn == 2) {
                                         System.out.println("Enter Movie Id: ");
                                         int id = input.nextInt();
                                         dataObject = new Movie(id, "", 0, 0);
-                                        operation = new Message("4,M");
+                                        operation = new Message("2,M");
 
                                         if (!myClient.sendObject(operation)) {
                                             System.out.println("Error Sending Data");
@@ -245,11 +231,32 @@ public class CinemaNetworkApp {
                                             System.out.println("Error Sending Data");
                                             continue;
                                         }
-                                    }else{
-                                        System.out.println("Only Admin has the Authorization to Delete Movies!");
-                                        continue;
-                                        
+                                    } else if (userIn == 4) {
+                                        if (currentUser.equals("admin")) {
+                                            System.out.println("Enter Movie Id: ");
+                                            int id = input.nextInt();
+                                            dataObject = new Movie(id, "", 0, 0);
+                                            operation = new Message("4,M");
+
+                                            if (!myClient.sendObject(operation)) {
+                                                System.out.println("Error Sending Data");
+                                                continue;
+                                            }
+
+                                            if (!myClient.sendObject(dataObject)) {
+                                                System.out.println("Error Sending Data");
+                                                continue;
+                                            }
+                                        } else {
+                                            System.out.println("Only Admin has the Authorization to Delete Movies!");
+                                            continue;
+
+                                        }
                                     }
+                                }
+                                catch (Exception ex){
+                                    System.out.println("\nPlease Enter Valid Values");
+                                    continue;
                                 }
 
                                 System.out.println("Waiting For Response");
@@ -368,7 +375,6 @@ public class CinemaNetworkApp {
 
                                         }catch (Exception e){
                                             System.out.println("Please enter valid inputs!");
-                                            e.printStackTrace();
                                             continue;
                                         }
 
@@ -398,20 +404,29 @@ public class CinemaNetworkApp {
                                     }
 
                                 } else {
-                                    System.out.println("Enter ticket Id: ");
-                                    int id = input.nextInt();
-                                    ticketObject = new Ticket(id, "", new Movie(0, "", 0, 0), new Date(), 0);
-                                    operation = new Message("2,T,"+currentUser);
 
-                                    if (!myClient.sendObject(operation)) {
-                                        System.out.println("Error Sending Data");
+                                    try{
+
+                                        System.out.println("Enter ticket Id: ");
+                                        int id = input.nextInt();
+                                        ticketObject = new Ticket(id, "", new Movie(0, "", 0, 0), new Date(), 0);
+                                        operation = new Message("2,T,"+currentUser);
+
+                                        if (!myClient.sendObject(operation)) {
+                                            System.out.println("Error Sending Data");
+                                            continue;
+                                        }
+
+                                        if (!myClient.sendObject(ticketObject)) {
+                                            System.out.println("Error Sending Data");
+                                            continue;
+                                        }
+
+                                    }catch (Exception ex){
+                                        System.out.println("Please Enter Valid Values");
                                         continue;
                                     }
 
-                                    if (!myClient.sendObject(ticketObject)) {
-                                        System.out.println("Error Sending Data");
-                                        continue;
-                                    }
 
                                 }
 
