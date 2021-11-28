@@ -331,36 +331,74 @@ public class server {
 
                     }else if(operation[0].trim().equals("1")){
                         System.out.println("Request to View All Tickets");
-                            
-                        //Calculating size of data to be sent
-                        int ticketCount = myTickets.size();
-                        if(ticketCount<1){
-                            myServer.sendResponse(new Message("No Ticket record found!"), myServer.packetIP, myServer.packetPort);
-                        }else{
-                            //Sending All data as Multiple Responses
-                            myServer.sendResponse(new Message("array-"+ticketCount), myServer.packetIP, myServer.packetPort);
-                            for (Ticket ticket: myTickets){
-                                myServer.sendResponse(ticket, myServer.packetIP, myServer.packetPort);
-                                System.out.println("Sending an Object\n");
+                        String username = operation[2].trim();
+                        System.out.println(username+" requested to view Tickets");
+                        if(username.equals("admin")){
+
+                            int ticketCount = myTickets.size();
+                            if(ticketCount<1){
+                                myServer.sendResponse(new Message("No Ticket record found!"), myServer.packetIP, myServer.packetPort);
+                            }else{
+                                //Sending All data as Multiple Responses
+                                myServer.sendResponse(new Message("array-"+ticketCount), myServer.packetIP, myServer.packetPort);
+                                for (Ticket ticket: myTickets){
+                                    myServer.sendResponse(ticket, myServer.packetIP, myServer.packetPort);
+                                    System.out.println("Sending an Object\n");
+                                }
                             }
+                        }else{
+
+                            ArrayList<Ticket> userTickets = new ArrayList<>();
+
+
+                            for (Ticket tkt : myTickets){
+                                if (tkt.username.equals(username)){
+                                    userTickets.add(tkt);
+                                }
+                            }
+
+
+
+
+                            int ticketCount = userTickets.size();
+                            if(ticketCount<1){
+                                myServer.sendResponse(new Message("No Ticket record found!"), myServer.packetIP, myServer.packetPort);
+                            }else{
+                                //Sending All data as Multiple Responses
+                                myServer.sendResponse(new Message("array-"+ticketCount), myServer.packetIP, myServer.packetPort);
+                                for (Ticket ticket: userTickets){
+                                    myServer.sendResponse(ticket, myServer.packetIP, myServer.packetPort);
+                                    System.out.println("Sending an Object\n");
+                                }
+                            }
+
                         }
+                            
+
                     }else if(operation[0].trim().equals("2")){
                         Ticket ticketObject = (Ticket) myServer.receiveObject();
                         System.out.println("Request to Search by id");
                         int searchid = ticketObject.id;
+                        String username = operation[2].trim();
+
                         boolean isFound=false;
 
                         //Searching for username and password in list
                         for (Ticket tkt: myTickets){
-                            if(tkt.id==searchid){
-                                
+                            if(username.equals("admin") && tkt.id==searchid){
+                                myServer.sendResponse(tkt, myServer.packetIP, myServer.packetPort);
+                                System.out.println("Sending an Object\n");
 
-                            //sending response if found
-                            myServer.sendResponse(tkt, myServer.packetIP, myServer.packetPort);
-                            System.out.println("Sending an Object\n");
+                                isFound=true;
+                                break;
+                            }
+                            else if(tkt.username.equals(username) && tkt.id==searchid){
+                                //sending response if found
+                                myServer.sendResponse(tkt, myServer.packetIP, myServer.packetPort);
+                                System.out.println("Sending an Object\n");
 
-                            isFound=true;
-                            break;
+                                isFound=true;
+                                break;
                             }
 
                         }

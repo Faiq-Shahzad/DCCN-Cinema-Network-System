@@ -332,33 +332,41 @@ public class CinemaNetworkApp {
                                 if (userIn == 4) {
                                     break;
                                 } else if (userIn == 1) {
-                                    System.out.print("Enter Ticket Id: ");
-                                    int id = input.nextInt();
-                                    System.out.print("Enter User Name: ");
-                                    String name = input.next();
-                                    System.out.print("Enter Movie Id: ");
-                                    int movieId = input.nextInt();
-                                    System.out.print("Enter Ticket Date dd/MM/yyyy: ");
-                                    Date ticketDate = new SimpleDateFormat("dd/MM/yyyy").parse(input.next());
-                                    System.out.print("Enter Time: ");
-                                    int time = input.nextInt();
+                                    if(currentUser.equals("admin")){
 
-                                    ticketObject = new Ticket(id, name, new Movie(movieId, "", 0, 0), ticketDate, time);
-                                    operation = new Message("0,T");
+                                        System.out.print("Enter Ticket Id: ");
+                                        int id = input.nextInt();
+                                        System.out.print("Enter User Name: ");
+                                        String name = input.next();
+                                        System.out.print("Enter Movie Id: ");
+                                        int movieId = input.nextInt();
+                                        System.out.print("Enter Ticket Date dd/MM/yyyy: ");
+                                        Date ticketDate = new SimpleDateFormat("dd/MM/yyyy").parse(input.next());
+                                        System.out.print("Enter Time: ");
+                                        int time = input.nextInt();
 
-                                    if (!myClient.sendObject(operation)) {
-                                        System.out.println("Error Sending Data");
+                                        ticketObject = new Ticket(id, name, new Movie(movieId, "", 0, 0), ticketDate, time);
+                                        operation = new Message("0,T");
+
+                                        if (!myClient.sendObject(operation)) {
+                                            System.out.println("Error Sending Data");
+                                            continue;
+                                        }
+
+                                        if (!myClient.sendObject(ticketObject)) {
+                                            System.out.println("Error Sending Data");
+                                            continue;
+                                        }
+
+                                    }else {
+                                        System.out.println("Only admin is allowed to book tickets");
                                         continue;
                                     }
 
-                                    if (!myClient.sendObject(ticketObject)) {
-                                        System.out.println("Error Sending Data");
-                                        continue;
-                                    }
 
 
                                 } else if (userIn == 2) {
-                                    operation = new Message("1,T");
+                                    operation = new Message("1,T,"+currentUser);
 
                                     if (!myClient.sendObject(operation)) {
                                         System.out.println("Error Sending Data");
@@ -369,7 +377,7 @@ public class CinemaNetworkApp {
                                     System.out.println("Enter ticket Id: ");
                                     int id = input.nextInt();
                                     ticketObject = new Ticket(id, "", new Movie(0, "", 0, 0), new Date(), 0);
-                                    operation = new Message("2,T");
+                                    operation = new Message("2,T,"+currentUser);
 
                                     if (!myClient.sendObject(operation)) {
                                         System.out.println("Error Sending Data");
