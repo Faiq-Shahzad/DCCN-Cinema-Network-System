@@ -83,108 +83,18 @@ public class server {
         //creating server
         server myServer = new server(7000);
         
+        System.out.println("Server Started at port 7000");
+      
         while(true){
             //Receiving Data
             Object receivedObject = myServer.receiveObject();
             
-            //Processing Received Data
-//            if(receivedObject instanceof Movie) {
-//
-//                Movie movieData = (Movie) receivedObject;
-//                System.out.printf("Movie Received!");
-
-//                int op = movieData.getOperation();
-
-//                switch (op) {
-//                    //FOR ADDING DATA
-//                    case 0:
-//                        System.out.println("Request to add Movie Data");
-//                        System.out.println(movieData.toString());
-//
-//                        int movieId = movieData.id;
-//                        System.out.println(movieId);
-//                        boolean movieChk = false;
-//
-//
-//                        for (Movie mov : mylist) {
-//                            if (mov.id == movieId) {
-//
-//                                System.out.println(mov.id);
-//                                System.out.println(mov.name);
-//
-//                                //sending response if found
-//                                myServer.sendResponse(new Message("Id already Exists! Please TRY AGAIN!"), myServer.packetIP, myServer.packetPort);
-//                                System.out.println("Response Sent");
-//                                movieChk = true;
-//                                break;
-//                            }
-//                        }
-//                        if (!movieChk){
-//                            //Saving Data to file
-//                            mylist.add(movieData);
-//                            writeDataToFile("M");
-//
-//                            //Sending Response
-//                            myServer.sendResponse(new Message("DATA ADDED SUCCESSFULLY"), myServer.packetIP, myServer.packetPort);
-//                            System.out.println("Response Sent");
-//                        }
-//                        break;
-//                    //FOR VIEWING ALL DATA
-//                    case 1:
-//                        System.out.println("Request to View All movies");
-//
-//                        //Calculating size of data to be sent
-//                        int movieCount = mylist.size();
-//                        if (movieCount < 1) {
-//                            myServer.sendResponse(new Message("No Movie record found!"), myServer.packetIP, myServer.packetPort);
-//                            break;
-//                        }
-//
-//                        //Sending All data as Multiple Responses
-//                        myServer.sendResponse(new Message("array-" + movieCount), myServer.packetIP, myServer.packetPort);
-//                        for (Movie mov : mylist) {
-//                            myServer.sendResponse(mov, myServer.packetIP, myServer.packetPort);
-//                            System.out.println("Sending an Object");
-//                        }
-//                        break;
-//                    //FOR SEARCHING DATA
-//                    case 2:
-//                        System.out.println("Request to Search by id");
-//                        int searchId = movieData.id;
-//                        boolean isFound = false;
-//
-//                        //Searching for id in list
-//                        for (Movie mov : mylist) {
-//                            if (mov.id == searchId) {
-//
-//                                //sending response if found
-//                                myServer.sendResponse(mov, myServer.packetIP, myServer.packetPort);
-//                                System.out.println("Sending an Object");
-//
-//                                isFound = true;
-//                                break;
-//                            }
-//
-//                        }
-//                        if (!isFound) {
-//                            myServer.sendResponse(new Message("No Movie Record with ID Found"), myServer.packetIP, myServer.packetPort);
-//                        }
-//                        break;
-//
-//                    default:
-//                        myServer.sendResponse(new Message("Invalid Operation"), myServer.packetIP, myServer.packetPort);
-//                        System.out.println("Invalid Operation");
-//                        break;
-//
-//
-//                }
-//            }
-//            else
+           
                 if(receivedObject instanceof Message){
-                System.out.println("Received Message");
-                Message msgbj = (Message) receivedObject;
-                
-                String[] operation = msgbj.getData().split(",");
+                    System.out.println("Received Message");
+                    Message msgbj = (Message) receivedObject;
+
+                    String[] operation = msgbj.getData().split(",");
 
 
 
@@ -265,15 +175,15 @@ public class server {
 
                         System.out.println(movieObject.toString());
 
-                        int ticketId = movieObject.id;
-                        System.out.println(ticketId);
+                        int movId = movieObject.id;
+                        System.out.println(movId);
                         boolean movieChk = false;
 
 
-                        for (Ticket tkt : myTickets) {
-                            if (tkt.id == ticketId) {
+                        for (Movie mov : mylist) {
+                            if (mov.id == movId) {
 
-                                System.out.println(tkt.id);
+                                System.out.println(mov.id);
 
                                 //sending response if found
                                 myServer.sendResponse(new Message("Id already Exists! Please TRY AGAIN!"), myServer.packetIP, myServer.packetPort);
@@ -322,6 +232,33 @@ public class server {
                                 //sending response if found
                                 myServer.sendResponse(mov, myServer.packetIP, myServer.packetPort);
                                 System.out.println("Sending an Object\n");
+
+                                isFound=true;
+                                break;
+                            }
+
+                        }
+                        if(!isFound){
+                            myServer.sendResponse(new Message("Not Found"), myServer.packetIP, myServer.packetPort);
+                        }
+                    }else if(operation[0].trim().equals("4")){
+                        Movie movieObject = (Movie) myServer.receiveObject();
+                        System.out.println("Request to Delete Movie by id");
+                        int searchid = movieObject.id;
+                        boolean isFound=false;
+
+                        //Searching for username and password in list
+                        for (Movie mov: mylist){
+                            if(mov.id==searchid){
+                                
+                                mylist.remove(mov);
+                                writeDataToFile("M");
+                                
+
+
+                                //sending response if found
+                                myServer.sendResponse(new Message("Movie with Id "+searchid+" successfully Deleted"), myServer.packetIP, myServer.packetPort);
+                                System.out.println("Sending an reply\n");
 
                                 isFound=true;
                                 break;
@@ -384,6 +321,7 @@ public class server {
                             //Saving Data to file
                             myTickets.add(ticketObject);
                             writeDataToFile("T");
+                            
 
                             //Sending Response
                             myServer.sendResponse(new Message("TICKET ADDED SUCCESSFULLY"), myServer.packetIP, myServer.packetPort);
@@ -393,36 +331,74 @@ public class server {
 
                     }else if(operation[0].trim().equals("1")){
                         System.out.println("Request to View All Tickets");
-                            
-                        //Calculating size of data to be sent
-                        int ticketCount = myTickets.size();
-                        if(ticketCount<1){
-                            myServer.sendResponse(new Message("No Ticket record found!"), myServer.packetIP, myServer.packetPort);
-                        }else{
-                            //Sending All data as Multiple Responses
-                            myServer.sendResponse(new Message("array-"+ticketCount), myServer.packetIP, myServer.packetPort);
-                            for (Ticket ticket: myTickets){
-                                myServer.sendResponse(ticket, myServer.packetIP, myServer.packetPort);
-                                System.out.println("Sending an Object\n");
+                        String username = operation[2].trim();
+                        System.out.println(username+" requested to view Tickets");
+                        if(username.equals("admin")){
+
+                            int ticketCount = myTickets.size();
+                            if(ticketCount<1){
+                                myServer.sendResponse(new Message("No Ticket record found!"), myServer.packetIP, myServer.packetPort);
+                            }else{
+                                //Sending All data as Multiple Responses
+                                myServer.sendResponse(new Message("array-"+ticketCount), myServer.packetIP, myServer.packetPort);
+                                for (Ticket ticket: myTickets){
+                                    myServer.sendResponse(ticket, myServer.packetIP, myServer.packetPort);
+                                    System.out.println("Sending an Object\n");
+                                }
                             }
+                        }else{
+
+                            ArrayList<Ticket> userTickets = new ArrayList<>();
+
+
+                            for (Ticket tkt : myTickets){
+                                if (tkt.username.equals(username)){
+                                    userTickets.add(tkt);
+                                }
+                            }
+
+
+
+
+                            int ticketCount = userTickets.size();
+                            if(ticketCount<1){
+                                myServer.sendResponse(new Message("No Ticket record found!"), myServer.packetIP, myServer.packetPort);
+                            }else{
+                                //Sending All data as Multiple Responses
+                                myServer.sendResponse(new Message("array-"+ticketCount), myServer.packetIP, myServer.packetPort);
+                                for (Ticket ticket: userTickets){
+                                    myServer.sendResponse(ticket, myServer.packetIP, myServer.packetPort);
+                                    System.out.println("Sending an Object\n");
+                                }
+                            }
+
                         }
+                            
+
                     }else if(operation[0].trim().equals("2")){
                         Ticket ticketObject = (Ticket) myServer.receiveObject();
                         System.out.println("Request to Search by id");
                         int searchid = ticketObject.id;
+                        String username = operation[2].trim();
+
                         boolean isFound=false;
 
                         //Searching for username and password in list
                         for (Ticket tkt: myTickets){
-                            if(tkt.id==searchid){
-                                
+                            if(username.equals("admin") && tkt.id==searchid){
+                                myServer.sendResponse(tkt, myServer.packetIP, myServer.packetPort);
+                                System.out.println("Sending an Object\n");
 
-                            //sending response if found
-                            myServer.sendResponse(tkt, myServer.packetIP, myServer.packetPort);
-                            System.out.println("Sending an Object\n");
+                                isFound=true;
+                                break;
+                            }
+                            else if(tkt.username.equals(username) && tkt.id==searchid){
+                                //sending response if found
+                                myServer.sendResponse(tkt, myServer.packetIP, myServer.packetPort);
+                                System.out.println("Sending an Object\n");
 
-                            isFound=true;
-                            break;
+                                isFound=true;
+                                break;
                             }
 
                         }
